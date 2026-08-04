@@ -26,7 +26,7 @@ export const Route = createFileRoute("/")({
     meta: [
       { title: "Beyond Radio — Boundless Radio, Streaming Live 24/7" },
       { name: "description", content: DESCRIPTION },
-      { property: "og:title", content: "Beyond Radio — Boundless Radio" },
+      { property: "og:title", content: "Beyond Radio — Boundless Radio, Streaming Live 24/7" },
       { property: "og:description", content: DESCRIPTION },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

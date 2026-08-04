@@ -77,14 +77,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "Beyond Radio — Boundless Radio, Streaming Live 24/7" },
+      { name: "description", content: "A responsive one-page website for Beyond Radio, a modern digital media platform for online radio." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "Beyond Radio — Boundless Radio, Streaming Live 24/7" },
+      { property: "og:description", content: "A responsive one-page website for Beyond Radio, a modern digital media platform for online radio." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Beyond Radio — Boundless Radio, Streaming Live 24/7" },
+      { name: "twitter:description", content: "A responsive one-page website for Beyond Radio, a modern digital media platform for online radio." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/125cc87e-81fa-4e47-80c6-64701df201b8/id-preview-c6d546f4--758c5caf-c1fb-41cf-8d84-19144072605a.lovable.app-1785860792646.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/125cc87e-81fa-4e47-80c6-64701df201b8/id-preview-c6d546f4--758c5caf-c1fb-41cf-8d84-19144072605a.lovable.app-1785860792646.png" },
     ],
     links: [
       {
