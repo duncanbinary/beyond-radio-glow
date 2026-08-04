@@ -1,3 +1,4 @@
+import logoAsset from "@/assets/beyond-radio-logo.png.asset.json";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   Facebook,
@@ -137,7 +138,7 @@ function Index() {
 
           <div className="relative z-10 mx-auto max-w-3xl text-center animate-rise">
             <img
-              src="/images/beyond-radio-logo.png"
+              src={logoAsset.url}
               alt="Beyond Radio logo"
               width={1024}
               height={1024}
@@ -330,7 +331,7 @@ function Index() {
 
       <footer className="relative border-t border-border px-5 py-14 text-center">
         <img
-          src="/images/beyond-radio-logo.png"
+          src={logoAsset.url}
           alt="Beyond Radio logo"
           width={1024}
           height={1024}

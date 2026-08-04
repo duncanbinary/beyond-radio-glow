@@ -1,3 +1,4 @@
+import logoAsset from "@/assets/beyond-radio-logo.png.asset.json";
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 
@@ -32,7 +33,7 @@ export function SiteNav() {
       >
         <a href="#home" className="flex min-w-0 items-center gap-3">
           <img
-            src="/images/beyond-radio-logo.png"
+            src={logoAsset.url}
             alt="Beyond Radio logo"
             width={1024}
             height={1024}
