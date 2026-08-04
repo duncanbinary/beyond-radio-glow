@@ -30,19 +30,18 @@ export function LivePlayer() {
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
-    audio.src = streamUrl;
     audio.volume = volume;
 
     const onWaiting = () => setStatus("buffering");
     const onPlaying = () => setStatus("playing");
     const onPause = () => setStatus((s) => (s === "error" ? s : "paused"));
-    const onError = () => setStatus("error");
+    const onError = () => setStatus((s) => (s === "ready" ? s : "error"));
 
     audio.addEventListener("waiting", onWaiting);
     audio.addEventListener("playing", onPlaying);
     audio.addEventListener("pause", onPause);
     audio.addEventListener("error", onError);
-    audio.load();
+
 
     return () => {
       audio.removeEventListener("waiting", onWaiting);
