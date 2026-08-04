@@ -124,7 +124,7 @@ export function LivePlayer() {
           barClassName="w-1 sm:w-1.5"
         />
 
-        <audio ref={audioRef} preload="none" className="mt-6 rounded-full">
+        <audio ref={audioRef} controls preload="none" src={streamUrl} className="mt-6 rounded-full">
           <track kind="captions" />
         </audio>
 
