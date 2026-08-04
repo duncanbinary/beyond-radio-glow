@@ -26,7 +26,7 @@ export function Equalizer({
             animationDuration: `${0.7 + ((i * 7) % 9) / 10}s`,
             animationDelay: `${(i % 5) * 0.12}s`,
             animationPlayState: active ? "running" : "paused",
-            transform: active ? undefined : `scaleY(${BARS[i % BARS.length] * 0.35})`,
+            transform: active ? undefined : `scaleY(${(BARS[i % BARS.length] ?? 0.5) * 0.35})`,
             opacity: active ? 1 : 0.4,
           }}
         />
