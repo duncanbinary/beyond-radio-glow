@@ -12,4 +12,9 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  // Self-hosted Node.js deployment (Ubuntu VPS behind Nginx) instead of Cloudflare Workers.
+  // Produces .output/server/index.mjs, a standalone Node server that honours PORT/HOST.
+  nitro: {
+    preset: "node-server",
+  },
 });
