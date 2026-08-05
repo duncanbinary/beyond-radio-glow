@@ -1,4 +1,4 @@
-import logoAsset from "@/assets/beyond-radio-logo.png.asset.json";
+import logoUrl from "@/assets/beyond-radio-logo.png";
 import { useEffect, useRef, useState } from "react";
 import { Pause, Play, Volume2, VolumeX } from "lucide-react";
 import { Equalizer } from "./visuals";
@@ -87,7 +87,7 @@ export function LivePlayer() {
       />
       <article className="glass animate-float relative rounded-[20px] p-7 text-center sm:p-9">
         <img
-          src={logoAsset.url}
+          src={logoUrl}
           alt="Beyond Radio logo"
           width={1024}
           height={1024}
