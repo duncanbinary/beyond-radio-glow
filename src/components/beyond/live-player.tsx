@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Pause, Play, Volume2, VolumeX } from "lucide-react";
 import { Equalizer } from "./visuals";
 
-const streamUrl = "https://sakazaradio.co.za/beyondradio";
+const streamUrl = "https://beyondradio.co.za/beyondradio";
 
 type Status = "ready" | "buffering" | "playing" | "paused" | "error";
 
