@@ -1,82 +1,155 @@
 import logoUrl from "@/assets/beyond-radio-logo.png";
-import { useEffect, useRef, useState } from "react";
-import { Pause, Play, Volume2, VolumeX } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Loader2, Pause, Play, Volume1, Volume2, VolumeX } from "lucide-react";
 import { Equalizer } from "./visuals";
 
-const streamUrl = "https://beyondradio.co.za/beyondradio";
+const STREAM_URL = "https://beyondradio.co.za/beyondradio";
+const MAX_RETRIES = 6;
 
-type Status = "ready" | "buffering" | "playing" | "paused" | "error";
+type Status = "idle" | "buffering" | "playing" | "paused" | "reconnecting" | "error";
 
 const STATUS_TEXT: Record<Status, string> = {
-  ready: "Ready to Play",
+  idle: "Ready to play",
   buffering: "Buffering…",
-  playing: "Playing Live",
+  playing: "Playing live",
   paused: "Paused",
-  error: "Stream Offline",
+  reconnecting: "Reconnecting…",
+  error: "Stream unavailable",
 };
 
 const STATUS_DOT: Record<Status, string> = {
-  ready: "bg-muted-foreground",
+  idle: "bg-muted-foreground",
   buffering: "bg-yellow-400",
   playing: "bg-primary",
   paused: "bg-muted-foreground",
+  reconnecting: "bg-yellow-400",
   error: "bg-destructive",
 };
 
 export function LivePlayer() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [status, setStatus] = useState<Status>("ready");
-  const [volume, setVolume] = useState(1);
+  const retriesRef = useRef(0);
+  const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const wantsPlayRef = useRef(false);
+
+  const [status, setStatus] = useState<Status>("idle");
+  const [volume, setVolume] = useState(0.9);
+  const [muted, setMuted] = useState(false);
+
+  const clearRetry = () => {
+    if (retryTimerRef.current) {
+      clearTimeout(retryTimerRef.current);
+      retryTimerRef.current = null;
+    }
+  };
+
+  const connect = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    wantsPlayRef.current = true;
+    setStatus((s) => (s === "reconnecting" ? s : "buffering"));
+    // cache-bust so a live stream always resumes at the current broadcast point
+    audio.src = `${STREAM_URL}?_=${Date.now()}`;
+    audio.load();
+    void audio.play().catch(() => scheduleReconnect());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const scheduleReconnect = useCallback(() => {
+    if (!wantsPlayRef.current) return;
+    if (retriesRef.current >= MAX_RETRIES) {
+      setStatus("error");
+      return;
+    }
+    clearRetry();
+    const delay = Math.min(1000 * 2 ** retriesRef.current, 15000);
+    retriesRef.current += 1;
+    setStatus("reconnecting");
+    retryTimerRef.current = setTimeout(() => connect(), delay);
+  }, [connect]);
 
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
     audio.volume = volume;
+    audio.muted = muted;
 
-    const onWaiting = () => setStatus("buffering");
-    const onPlaying = () => setStatus("playing");
-    const onPause = () => setStatus((s) => (s === "error" ? s : "paused"));
-    const onError = () => setStatus((s) => (s === "ready" ? s : "error"));
+    const onWaiting = () => setStatus((s) => (s === "reconnecting" ? s : "buffering"));
+    const onPlaying = () => {
+      retriesRef.current = 0;
+      setStatus("playing");
+    };
+    const onPause = () => {
+      if (!wantsPlayRef.current) setStatus("paused");
+    };
+    const onError = () => {
+      if (wantsPlayRef.current) scheduleReconnect();
+    };
+    const onEnded = () => scheduleReconnect();
+    const onStalled = () => {
+      if (wantsPlayRef.current) scheduleReconnect();
+    };
 
     audio.addEventListener("waiting", onWaiting);
     audio.addEventListener("playing", onPlaying);
     audio.addEventListener("pause", onPause);
     audio.addEventListener("error", onError);
-
+    audio.addEventListener("ended", onEnded);
+    audio.addEventListener("stalled", onStalled);
 
     return () => {
       audio.removeEventListener("waiting", onWaiting);
       audio.removeEventListener("playing", onPlaying);
       audio.removeEventListener("pause", onPause);
       audio.removeEventListener("error", onError);
+      audio.removeEventListener("ended", onEnded);
+      audio.removeEventListener("stalled", onStalled);
+      clearRetry();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [scheduleReconnect]);
 
-  const playStream = () => {
+  const stop = () => {
+    wantsPlayRef.current = false;
+    clearRetry();
+    retriesRef.current = 0;
     const audio = audioRef.current;
-    if (!audio) return;
-    setStatus("buffering");
-    // reload so a live stream always resumes at the current broadcast point
-    audio.src = streamUrl;
-    audio.load();
-    void audio.play().then(
-      () => setStatus("playing"),
-      () => setStatus("error"),
-    );
+    if (audio) {
+      audio.pause();
+      audio.removeAttribute("src");
+      audio.load();
+    }
+    setStatus("paused");
   };
 
-  const pauseStream = () => {
-    audioRef.current?.pause();
-    setStatus("paused");
+  const toggle = () => {
+    if (wantsPlayRef.current) stop();
+    else {
+      retriesRef.current = 0;
+      connect();
+    }
   };
 
   const changeVolume = (v: number) => {
     setVolume(v);
-    if (audioRef.current) audioRef.current.volume = v;
+    if (audioRef.current) {
+      audioRef.current.volume = v;
+      if (v > 0 && muted) {
+        audioRef.current.muted = false;
+        setMuted(false);
+      }
+    }
   };
 
-  const isPlaying = status === "playing" || status === "buffering";
+  const toggleMute = () => {
+    const next = !muted;
+    setMuted(next);
+    if (audioRef.current) audioRef.current.muted = next;
+  };
+
+  const isBusy = status === "buffering" || status === "reconnecting";
+  const isOn = status === "playing" || isBusy;
+  const VolumeIcon = muted || volume === 0 ? VolumeX : volume < 0.5 ? Volume1 : Volume2;
 
   return (
     <div className="relative mx-auto w-full max-w-[480px]">
@@ -85,13 +158,13 @@ export function LivePlayer() {
         className="pointer-events-none absolute -inset-10 rounded-[3rem] opacity-70 blur-3xl"
         style={{ background: "var(--gradient-glow)" }}
       />
-      <article className="glass animate-float relative rounded-[20px] p-7 text-center sm:p-9">
+      <article className="glass animate-float relative rounded-[24px] p-6 text-center sm:p-9">
         <img
           src={logoUrl}
           alt="Beyond Radio logo"
           width={1024}
           height={1024}
-          className="mx-auto h-24 w-24 object-contain drop-shadow-[0_0_28px_rgba(245,124,0,0.55)]"
+          className="mx-auto h-20 w-20 object-contain drop-shadow-[0_0_28px_rgba(245,124,0,0.55)] sm:h-24 sm:w-24"
         />
 
         <div className="animate-pulse-glow mx-auto mt-5 inline-flex items-center gap-2 rounded-full border border-primary/50 bg-primary/10 px-4 py-1.5 text-xs font-semibold tracking-[0.2em] text-primary uppercase">
@@ -99,13 +172,11 @@ export function LivePlayer() {
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
           </span>
-          Live on air
+          Live
         </div>
 
-        <h2 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">
-          Beyond Radio
-        </h2>
-        <p className="brand-gradient-text mt-1 text-sm font-semibold tracking-[0.3em] uppercase">
+        <h2 className="mt-4 text-2xl font-extrabold tracking-tight sm:text-4xl">Beyond Radio</h2>
+        <p className="brand-gradient-text mt-1 text-xs font-semibold tracking-[0.3em] uppercase sm:text-sm">
           Boundless Radio
         </p>
 
@@ -114,65 +185,67 @@ export function LivePlayer() {
           aria-live="polite"
           className="mt-5 inline-flex items-center gap-2 rounded-full bg-secondary/70 px-4 py-2 text-sm text-muted-foreground"
         >
-          <span className={`h-2.5 w-2.5 rounded-full ${STATUS_DOT[status]}`} />
+          {isBusy ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+          ) : (
+            <span className={`h-2.5 w-2.5 rounded-full ${STATUS_DOT[status]}`} />
+          )}
           {STATUS_TEXT[status]}
         </div>
 
         <Equalizer
           active={status === "playing"}
           bars={22}
-          className="mt-6 h-14"
+          className="mt-6 h-12 sm:h-14"
           barClassName="w-1 sm:w-1.5"
         />
 
-        <audio ref={audioRef} controls preload="none" src={streamUrl} className="mt-6 rounded-full">
+        <audio ref={audioRef} preload="none" className="hidden">
           <track kind="captions" />
         </audio>
 
-        <div className="mt-6 flex items-center justify-center gap-3">
+        <div className="mt-7 flex justify-center">
           <button
             type="button"
-            onClick={playStream}
-            aria-label="Play live stream"
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl px-6 py-3.5 text-base font-semibold text-primary-foreground transition-transform duration-300 hover:scale-[1.03] focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-            style={{
-              background: "var(--gradient-brand)",
-              boxShadow: "var(--shadow-glow)",
-            }}
+            onClick={toggle}
+            aria-label={isOn ? "Pause live stream" : "Play live stream"}
+            className="grid h-20 w-20 place-items-center rounded-full text-primary-foreground transition-transform duration-300 hover:scale-105 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none sm:h-24 sm:w-24"
+            style={{ background: "var(--gradient-brand)", boxShadow: "var(--shadow-glow)" }}
           >
-            <Play className="h-5 w-5 fill-current" /> Play
-          </button>
-          <button
-            type="button"
-            onClick={pauseStream}
-            aria-label="Pause live stream"
-            className="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl border border-border bg-secondary/70 px-6 py-3.5 text-base font-semibold text-foreground transition-colors duration-300 hover:border-primary/60 hover:text-primary focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-          >
-            <Pause className="h-5 w-5" /> Pause
+            {isBusy ? (
+              <Loader2 className="h-9 w-9 animate-spin" />
+            ) : isOn ? (
+              <Pause className="h-9 w-9 fill-current sm:h-10 sm:w-10" />
+            ) : (
+              <Play className="ml-1 h-9 w-9 fill-current sm:h-10 sm:w-10" />
+            )}
           </button>
         </div>
 
-        <div className="mt-6 flex items-center gap-3">
-          {volume === 0 ? (
-            <VolumeX className="h-5 w-5 shrink-0 text-muted-foreground" />
-          ) : (
-            <Volume2 className="h-5 w-5 shrink-0 text-primary" />
-          )}
+        <div className="mt-7 flex items-center gap-3">
+          <button
+            type="button"
+            onClick={toggleMute}
+            aria-label={muted ? "Unmute" : "Mute"}
+            className="shrink-0 text-muted-foreground transition-colors hover:text-primary"
+          >
+            <VolumeIcon className={`h-5 w-5 ${muted || volume === 0 ? "" : "text-primary"}`} />
+          </button>
           <input
             type="range"
             min={0}
             max={1}
             step={0.01}
-            value={volume}
+            value={muted ? 0 : volume}
             aria-label="Volume"
             onChange={(e) => changeVolume(Number(e.target.value))}
             className="w-full cursor-pointer"
-            style={{ ["--range" as string]: `${volume * 100}%` }}
+            style={{ ["--range" as string]: `${(muted ? 0 : volume) * 100}%` }}
           />
         </div>
 
         <p className="mt-5 text-xs text-muted-foreground">
-          Streaming 24/7 · {isPlaying ? "Connected" : "Tap play to tune in"}
+          Streaming 24/7 · {isOn ? "Connected" : "Tap play to tune in"}
         </p>
       </article>
     </div>
