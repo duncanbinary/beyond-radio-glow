@@ -243,9 +243,9 @@ function Index() {
           <Reveal delay={100}>
             <div className="glass mx-auto mt-12 max-w-3xl rounded-3xl p-8 sm:p-12">
               <p className="text-base leading-relaxed text-muted-foreground sm:text-lg">
-                Beyond Radio is a digital community radio station dedicated to informing, inspiring
-                and connecting audiences through quality music, news, culture, education and
-                meaningful conversations.
+                Beyond Radio is a South African digital community radio station dedicated to
+                informing, inspiring and connecting audiences through quality music, news, culture,
+                education and meaningful conversations.
               </p>
               <p className="mt-5 text-base leading-relaxed text-muted-foreground sm:text-lg">
                 Our mission is to create a platform where every voice matters while embracing
