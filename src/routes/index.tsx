@@ -18,18 +18,57 @@ import { SiteNav } from "@/components/beyond/site-nav";
 import { LivePlayer } from "@/components/beyond/live-player";
 import { Equalizer, Reveal } from "@/components/beyond/visuals";
 
+const SITE_URL = "https://beyondradio.co.za/";
+const TITLE = "Beyond Radio South Africa | Boundless Radio | Listen Live";
 const DESCRIPTION =
-  "Beyond Radio is a modern digital radio station connecting communities through music, news, education, culture and inspiring conversations.";
+  "Beyond Radio is a South African digital community radio station broadcasting music, news, education, culture and conversations 24/7. Listen live online.";
+const OG_TITLE = "Beyond Radio South Africa | Boundless Radio";
+const OG_DESCRIPTION =
+  "South African digital community radio broadcasting music, news, education, culture and conversations 24/7.";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Beyond Radio — Boundless Radio, Streaming Live 24/7" },
+      { title: TITLE },
       { name: "description", content: DESCRIPTION },
-      { property: "og:title", content: "Beyond Radio — Boundless Radio, Streaming Live 24/7" },
-      { property: "og:description", content: DESCRIPTION },
+      { property: "og:title", content: OG_TITLE },
+      { property: "og:description", content: OG_DESCRIPTION },
+      { property: "og:url", content: SITE_URL },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: OG_TITLE },
+      { name: "twitter:description", content: OG_DESCRIPTION },
+    ],
+    links: [{ rel: "canonical", href: SITE_URL }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "WebSite",
+              "@id": `${SITE_URL}#website`,
+              url: SITE_URL,
+              name: "Beyond Radio",
+              alternateName: "Boundless Radio",
+              description: DESCRIPTION,
+              inLanguage: "en-ZA",
+              publisher: { "@id": `${SITE_URL}#organization` },
+            },
+            {
+              "@type": "RadioStation",
+              "@id": `${SITE_URL}#organization`,
+              name: "Beyond Radio",
+              alternateName: "Boundless Radio",
+              url: SITE_URL,
+              description: DESCRIPTION,
+              areaServed: { "@type": "Country", name: "South Africa" },
+              address: { "@type": "PostalAddress", addressCountry: "ZA" },
+            },
+          ],
+        }),
+      },
     ],
   }),
   component: Index,
