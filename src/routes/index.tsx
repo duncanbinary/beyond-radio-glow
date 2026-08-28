@@ -225,7 +225,10 @@ function Index() {
         {/* PLAYER */}
         <section id="listen" className="relative px-5 py-24">
           <Reveal>
-            <SectionTitle eyebrow="On air now" title="The Beyond Radio Player" />
+            <SectionTitle
+              eyebrow="Listen Live"
+              title="Listen to Beyond Radio South Africa Live"
+            />
           </Reveal>
           <Reveal delay={120} className="mt-14">
             <LivePlayer />
