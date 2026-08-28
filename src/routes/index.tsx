@@ -184,7 +184,7 @@ function Index() {
           <div className="relative z-10 mx-auto max-w-3xl text-center animate-rise">
             <img
               src={logoUrl}
-              alt="Beyond Radio logo"
+              alt="Beyond Radio South Africa logo"
               width={1024}
               height={1024}
               className="mx-auto h-32 w-32 object-contain drop-shadow-[0_0_45px_rgba(245,124,0,0.5)] sm:h-40 sm:w-40"
