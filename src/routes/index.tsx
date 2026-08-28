@@ -38,6 +38,12 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: OG_TITLE },
       { name: "twitter:description", content: OG_DESCRIPTION },
+      { property: "og:image", content: `${SITE_URL}beyond-radio-logo.png` },
+      { property: "og:image:alt", content: "Beyond Radio South Africa logo" },
+      { property: "og:site_name", content: "Beyond Radio" },
+      { property: "og:locale", content: "en_ZA" },
+      { name: "twitter:image", content: `${SITE_URL}beyond-radio-logo.png` },
+      { name: "robots", content: "index, follow" },
     ],
     links: [{ rel: "canonical", href: SITE_URL }],
     scripts: [
