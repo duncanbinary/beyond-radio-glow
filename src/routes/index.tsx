@@ -38,6 +38,12 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: OG_TITLE },
       { name: "twitter:description", content: OG_DESCRIPTION },
+      { property: "og:image", content: `${SITE_URL}beyond-radio-logo.png` },
+      { property: "og:image:alt", content: "Beyond Radio South Africa logo" },
+      { property: "og:site_name", content: "Beyond Radio" },
+      { property: "og:locale", content: "en_ZA" },
+      { name: "twitter:image", content: `${SITE_URL}beyond-radio-logo.png` },
+      { name: "robots", content: "index, follow" },
     ],
     links: [{ rel: "canonical", href: SITE_URL }],
     scripts: [
@@ -178,7 +184,7 @@ function Index() {
           <div className="relative z-10 mx-auto max-w-3xl text-center animate-rise">
             <img
               src={logoUrl}
-              alt="Beyond Radio logo"
+              alt="Beyond Radio South Africa logo"
               width={1024}
               height={1024}
               className="mx-auto h-32 w-32 object-contain drop-shadow-[0_0_45px_rgba(245,124,0,0.5)] sm:h-40 sm:w-40"
@@ -189,10 +195,14 @@ function Index() {
             <p className="mt-3 text-sm font-semibold tracking-[0.42em] text-primary uppercase sm:text-base">
               Boundless Radio
             </p>
+            <p className="mt-4 text-sm font-medium text-foreground/80 sm:text-base">
+              Beyond Radio — South African Digital Community Radio
+            </p>
             <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Beyond Radio is a modern digital radio station connecting communities through music,
-              news, education, culture and inspiring conversations. Broadcasting beyond borders, we
-              bring people together through powerful storytelling and quality entertainment.
+              Beyond Radio is a South African digital community radio station bringing together
+              music, news, education, culture and meaningful conversations. Broadcasting 24/7,
+              Beyond Radio connects listeners through a modern digital radio experience while
+              creating space for community voices, ideas and stories.
             </p>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
               <a
@@ -215,7 +225,10 @@ function Index() {
         {/* PLAYER */}
         <section id="listen" className="relative px-5 py-24">
           <Reveal>
-            <SectionTitle eyebrow="On air now" title="The Beyond Radio Player" />
+            <SectionTitle
+              eyebrow="Listen Live"
+              title="Listen to Beyond Radio South Africa Live"
+            />
           </Reveal>
           <Reveal delay={120} className="mt-14">
             <LivePlayer />
@@ -230,9 +243,9 @@ function Index() {
           <Reveal delay={100}>
             <div className="glass mx-auto mt-12 max-w-3xl rounded-3xl p-8 sm:p-12">
               <p className="text-base leading-relaxed text-muted-foreground sm:text-lg">
-                Beyond Radio is a digital community radio station dedicated to informing, inspiring
-                and connecting audiences through quality music, news, culture, education and
-                meaningful conversations.
+                Beyond Radio is a South African digital community radio station dedicated to
+                informing, inspiring and connecting audiences through quality music, news, culture,
+                education and meaningful conversations.
               </p>
               <p className="mt-5 text-base leading-relaxed text-muted-foreground sm:text-lg">
                 Our mission is to create a platform where every voice matters while embracing
