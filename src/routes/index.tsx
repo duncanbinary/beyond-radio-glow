@@ -195,10 +195,14 @@ function Index() {
             <p className="mt-3 text-sm font-semibold tracking-[0.42em] text-primary uppercase sm:text-base">
               Boundless Radio
             </p>
+            <p className="mt-4 text-sm font-medium text-foreground/80 sm:text-base">
+              Beyond Radio — South African Digital Community Radio
+            </p>
             <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Beyond Radio is a modern digital radio station connecting communities through music,
-              news, education, culture and inspiring conversations. Broadcasting beyond borders, we
-              bring people together through powerful storytelling and quality entertainment.
+              Beyond Radio is a South African digital community radio station bringing together
+              music, news, education, culture and meaningful conversations. Broadcasting 24/7,
+              Beyond Radio connects listeners through a modern digital radio experience while
+              creating space for community voices, ideas and stories.
             </p>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
               <a
